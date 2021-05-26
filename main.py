@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from WebObject import WebObject
 
 BASE_URL = 'https://transcripts.foreverdreaming.org/viewforum.php?f=574'
+BASE_BASE_URL = 'https://transcripts.foreverdreaming.org/'
 PAGES = '&start='
 PAGINATION_QUANTITY = 25
 CURRENT_PAGE = 0
@@ -39,6 +40,13 @@ def convertToObject(unstructured):
     for records in unstructured:
         officeObjects.append(WebObject(records.text, records['href']))
 
+def downloadScriptFor(episode):
+    episode = BASE_BASE_URL + episode.urlAddress[2:]
+    downloadFile = requests.get(episode)
+    soup = BeautifulSoup(downloadFile.content, 'html.parser')
+    dialog = soup.find_all('p')
+    #for test in dialog:
+        #print(test)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -49,6 +57,9 @@ if __name__ == '__main__':
         parseHtml(PAGE)
         CURRENT_PAGE += PAGINATION_QUANTITY
 
+    #Converts all the unstructured html tags to objects
     convertToObject(allatags)
+
+    downloadScriptFor(officeObjects[1])
 
     print(len(officeObjects))
