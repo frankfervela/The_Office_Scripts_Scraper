@@ -1,5 +1,5 @@
 # Scraper for the office scripts
-# Thanks for https://transcripts.foreverdreaming.org for
+# Thanks to https://transcripts.foreverdreaming.org for
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -58,11 +58,12 @@ def convert_to_object(unstructured):
 
 # Downloading the tags containing the script information
 def download_script_for(episode):
+
     print(f'Generating script file for {episode.fileName}', '\n')
     episode = BASE_BASE_URL + episode.urlAddress[2:]
     download_file = requests.get(episode)
     soup = BeautifulSoup(download_file.content, 'html.parser')
-    dialog = soup.find_all('p')
+    dialog = soup.find_all(['p', 'hr'])
 
     return dialog
 
@@ -70,14 +71,13 @@ def download_script_for(episode):
 # Generating all script files
 def generate_script_files():
     for episode in OFFICE_OBJECTS:
-        if episode.fileName == 'Please Read Updates: Take the 2021 Challenge!':
+
+        if episode.fileName == 'Please Read Updates: Take the 2021 Challenge!' or episode.fileName == 'Updates: Happy New Year 1/1/22':
             continue
 
         downloaded_dialog = download_script_for(episode)
 
-        clean_name = episode.fileName.replace('/', "")
-        clean_name = clean_name.replace('?', "")
-        clean_name = clean_name.replace('*', "")
+        clean_name = episode.fileName.replace('/', "").replace('?', "").replace('*', "")
 
         with open(f"{DIRECTORY_PATH}/{clean_name}.txt", "x", encoding="utf-8") as file_handler:
             for line in downloaded_dialog:
